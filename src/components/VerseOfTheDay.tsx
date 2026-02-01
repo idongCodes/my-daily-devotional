@@ -8,7 +8,8 @@ interface VerseData {
   text: string;
   reference: string;
   context?: string;
-  application?: string; // Added application field
+  application?: string;
+  prayer?: string; // Added prayer field
 }
 
 export default function VerseOfTheDay() {
@@ -85,8 +86,8 @@ export default function VerseOfTheDay() {
             setVerse(currentVerse);
             setLoading(false); // Main verse loaded
 
-            // Now check/fetch context/application if missing
-            if (!currentVerse.context || !currentVerse.application) {
+            // Now check/fetch context/application/prayer if missing
+            if (!currentVerse.context || !currentVerse.application || !currentVerse.prayer) {
                 setContextLoading(true);
                 setContextError(null);
 
@@ -107,10 +108,11 @@ export default function VerseOfTheDay() {
                     Provide a response in strictly valid JSON format with the following structure:
                     {
                       "context": "Detailed spiritual and historical context (approx 500 words).",
-                      "application": "A detailed Life Application Case Study describing real-life scenarios where this verse applies (approx 700 words)."
+                      "application": "A detailed Life Application Case Study describing real-life scenarios where this verse applies (approx 700 words).",
+                      "prayer": "A comprehensive prayer (approx 1000 words) based on the verse. Structure the prayer exactly as follows: 1. Praise and Worship (few sentences). 2. Thanksgiving (few sentences). 3. Asking for Cleansing and Forgiveness. 4. Inviting Communion with the Holy Spirit. 5. Asking for Restoration and Intervention in life's endeavors/difficulties. 6. Asking for help applying today's word. 7. Praise of who God is. 8. Inviting God's Will. 9. Ending with a Benediction."
                     }
                     
-                    Ensure the tone is encouraging, instructional, and practical. Do not include markdown formatting like \`\`\`json.`;
+                    Ensure the tone is encouraging, instructional, and deeply spiritual. Do not include markdown formatting like \`\`\`json.`;
                     
                     const result = await model.generateContent(prompt);
                     const response = await result.response;
@@ -122,6 +124,7 @@ export default function VerseOfTheDay() {
 
                     currentVerse.context = aiData.context;
                     currentVerse.application = aiData.application;
+                    currentVerse.prayer = aiData.prayer;
                     
                     // Update state
                     setVerse({ ...currentVerse });
@@ -194,6 +197,8 @@ export default function VerseOfTheDay() {
                 ) : verse.context ? (
                     <p className="text-gray-700 dark:text-gray-300 leading-7 whitespace-pre-line">
                         {verse.context}
+                        <br />
+                        <span className="text-xs text-gray-400 mt-2 block italic">Summary by Gemini AI</span>
                     </p>
                 ) : (
                     <p className="text-gray-500 italic text-sm">
@@ -220,6 +225,26 @@ export default function VerseOfTheDay() {
                 ) : (
                     <p className="text-gray-500 italic text-sm">
                          {contextError || "AI Application unavailable."}
+                    </p>
+                )}
+            </div>
+
+            {/* Prayer Section */}
+            <div className="w-full text-left max-w-3xl border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
+                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Prayer</h3>
+                {contextLoading ? (
+                    <div className="animate-pulse space-y-2">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-5/6"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-4/6"></div>
+                    </div>
+                ) : verse.prayer ? (
+                    <p className="text-gray-700 dark:text-gray-300 leading-7 whitespace-pre-line font-serif italic text-lg">
+                        {verse.prayer}
+                    </p>
+                ) : (
+                    <p className="text-gray-500 italic text-sm">
+                         {contextError || "Prayer unavailable."}
                     </p>
                 )}
             </div>
