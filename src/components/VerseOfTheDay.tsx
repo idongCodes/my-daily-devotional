@@ -1,25 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ChapterModal from "./ChapterModal";
+import { getVerseContext } from "@/app/actions";
 
 interface VerseData {
   text: string;
   reference: string;
-}
-
-interface CachedVerse {
-  verse: VerseData;
-  expiresAt: number; // Timestamp
+  context?: string; // Added context field
 }
 
 export default function VerseOfTheDay() {
   const [verse, setVerse] = useState<VerseData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [contextLoading, setContextLoading] = useState(false);
+  const [contextError, setContextError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Ref to track if we've already started the fetch to prevent double-firing in Strict Mode
+  const hasFetched = useRef(false);
 
   useEffect(() => {
-    const fetchVerse = async () => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
+    const fetchVerseAndContext = async () => {
       try {
         // Calculate the "Effective Date" in ET (changes at 7am ET)
         const now = new Date();
@@ -50,47 +55,86 @@ export default function VerseOfTheDay() {
 
         // Check Cache
         const stored = localStorage.getItem(storageKey);
+        let currentVerse: VerseData | null = null;
+
         if (stored) {
-          setVerse(JSON.parse(stored));
-          setLoading(false);
-          return;
+          const parsed = JSON.parse(stored);
+          currentVerse = parsed;
+        } else {
+           // Cleanup old keys
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('votd_') && key !== storageKey) {
+                    localStorage.removeItem(key);
+                }
+            }
+
+            // Fetch new verse
+            const res = await fetch("https://bible-api.com/?random=verse");
+            if (!res.ok) throw new Error("Failed to fetch verse");
+            const data = await res.json();
+
+            currentVerse = {
+              text: data.text.trim(),
+              reference: data.reference,
+            };
         }
 
-        // Cleanup old keys
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith('votd_') && key !== storageKey) {
-                localStorage.removeItem(key);
+        if (currentVerse) {
+            setVerse(currentVerse);
+            setLoading(false); // Main verse loaded
+
+            // Now check/fetch context if missing
+            if (!currentVerse.context) {
+                // If we previously tried and failed with a permanent error, maybe we shouldn't retry immediately?
+                // But for now, let's try.
+                setContextLoading(true);
+                setContextError(null);
+
+                const contextRes = await getVerseContext(currentVerse.reference, currentVerse.text);
+                
+                if (contextRes.success && contextRes.data) {
+                    currentVerse.context = contextRes.data;
+                    // Update state
+                    setVerse({ ...currentVerse });
+                    // Update cache
+                    localStorage.setItem(storageKey, JSON.stringify(currentVerse));
+                } else {
+                    const errMsg = contextRes.error || "Failed to load context.";
+                    console.warn(errMsg);
+                    
+                    if (errMsg.includes("429") || errMsg.includes("Too Many Requests")) {
+                       setContextError("AI Service is busy (Rate Limit). Please try again later.");
+                    } else if (errMsg.includes("GEMINI_API_KEY")) {
+                       setContextError("AI Service not configured.");
+                    } else {
+                       setContextError("Temporarily unavailable.");
+                    }
+                }
+                setContextLoading(false);
+            } else {
+                 // Ensure cache is fresh if we just fetched a new verse without context above
+                 if (!stored) {
+                    localStorage.setItem(storageKey, JSON.stringify(currentVerse));
+                 }
             }
         }
-
-        // Fetch new verse
-        const res = await fetch("https://bible-api.com/?random=verse");
-        if (!res.ok) throw new Error("Failed to fetch verse");
-        const data = await res.json();
-
-        const newVerse: VerseData = {
-          text: data.text.trim(),
-          reference: data.reference,
-        };
-
-        localStorage.setItem(storageKey, JSON.stringify(newVerse));
-        setVerse(newVerse);
 
       } catch (error) {
         console.error("Error fetching verse:", error);
       } finally {
         setLoading(false);
+        setContextLoading(false);
       }
     };
 
-    fetchVerse();
+    fetchVerseAndContext();
   }, []);
 
   return (
-    <div className="w-full text-center mt-8 mb-12">
+    <div className="w-full text-center mt-8 mb-12 flex flex-col items-center">
       <h1 className="text-4xl font-bold mb-8">Verse of the Day</h1>
-      <div className="min-h-[120px] flex flex-col items-center justify-center">
+      <div className="min-h-[120px] flex flex-col items-center justify-center w-full">
         {loading ? (
            <div className="animate-pulse space-y-4 w-full max-w-2xl">
             <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-3/4 mx-auto"></div>
@@ -98,8 +142,8 @@ export default function VerseOfTheDay() {
             <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/4 mx-auto mt-4"></div>
           </div>
         ) : verse ? (
-          <div className="max-w-3xl mx-auto px-4 animate-in fade-in duration-700">
-            <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed text-gray-800 dark:text-gray-200 mb-6">
+          <div className="max-w-3xl mx-auto px-4 animate-in fade-in duration-700 flex flex-col items-center">
+            <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed text-gray-800 dark:text-gray-200 mb-6 text-center">
               &ldquo;{verse.text}&rdquo;
             </blockquote>
             <cite className="text-lg font-medium text-gray-600 dark:text-gray-400 not-italic block mb-4">
@@ -107,10 +151,33 @@ export default function VerseOfTheDay() {
             </cite>
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-wider bg-transparent border-none cursor-pointer"
+              className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-wider bg-transparent border-none cursor-pointer mb-12"
             >
               Read Full Chapter
             </button>
+            
+            {/* Context Section */}
+            <div className="w-full text-left max-w-3xl border-t border-gray-200 dark:border-gray-800 pt-8">
+                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">The Context</h3>
+                {contextLoading ? (
+                    <div className="animate-pulse space-y-2">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-5/6"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-4/6"></div>
+                    </div>
+                ) : verse.context ? (
+                    <p className="text-gray-700 dark:text-gray-300 leading-7 whitespace-pre-line">
+                        {verse.context}
+                        <br />
+                        <span className="text-xs text-gray-400 mt-2 block italic">Summary by Gemini AI</span>
+                    </p>
+                ) : (
+                    <p className="text-gray-500 italic text-sm">
+                        {contextError || "AI Context unavailable."}
+                    </p>
+                )}
+            </div>
+
           </div>
         ) : (
            <div className="text-red-500">Failed to load verse.</div>
