@@ -32,11 +32,12 @@ export default function ChapterModal({ isOpen, onClose, chapterReference }: Chap
   useEffect(() => {
     if (isOpen) {
       setIsMounted(true);
-      // Small delay to allow mount before triggering transition
-      requestAnimationFrame(() => {
+      // Use setTimeout to ensure the browser has painted the "mounted" state (opacity-0)
+      // before switching to "visible" (opacity-100).
+      const timer = setTimeout(() => {
         setIsVisible(true);
-      });
-
+      }, 50); // Small delay to guarantee transition
+      
       if (chapterReference) {
         setLoading(true);
         setError(null);
@@ -57,6 +58,7 @@ export default function ChapterModal({ isOpen, onClose, chapterReference }: Chap
             setLoading(false);
           });
       }
+      return () => clearTimeout(timer);
     } else {
       setIsVisible(false);
       const timer = setTimeout(() => {
