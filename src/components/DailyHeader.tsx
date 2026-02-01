@@ -24,10 +24,19 @@ export default function DailyHeader() {
   useEffect(() => {
     // 1. Set Date
     const now = new Date();
-    const formattedDate = `${String(now.getMonth() + 1).padStart(2, "0")}/${String(
-      now.getDate()
-    ).padStart(2, "0")}/${now.getFullYear()}`;
-    setDateString(formattedDate);
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(now); // e.g., "Sun, Feb 1, 2026"
+
+    // Remove the comma after the day if strict "Sun, Feb 1 2026" format is required,
+    // but the standard Intl output "Sun, Feb 1, 2026" is usually preferred.
+    // The user example "Sun, Feb 1 2026" has no comma after day.
+    // Let's manually construct it to match exactly or just remove the comma.
+    
+    setDateString(formattedDate.replace(/, (\d{4})/, ' $1'));
 
     // 2. Fetch Weather
     if (navigator.geolocation) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ChapterModal from "./ChapterModal";
 
 interface VerseData {
   text: string;
@@ -15,6 +16,7 @@ interface CachedVerse {
 export default function VerseOfTheDay() {
   const [verse, setVerse] = useState<VerseData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchVerse = async () => {
@@ -100,14 +102,28 @@ export default function VerseOfTheDay() {
             <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed text-gray-800 dark:text-gray-200 mb-6">
               &ldquo;{verse.text}&rdquo;
             </blockquote>
-            <cite className="text-lg font-medium text-gray-600 dark:text-gray-400 not-italic">
+            <cite className="text-lg font-medium text-gray-600 dark:text-gray-400 not-italic block mb-4">
               — {verse.reference}
             </cite>
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-wider bg-transparent border-none cursor-pointer"
+            >
+              Read Full Chapter
+            </button>
           </div>
         ) : (
            <div className="text-red-500">Failed to load verse.</div>
         )}
       </div>
+
+      {verse && (
+        <ChapterModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          chapterReference={verse.reference.split(':')[0]} 
+        />
+      )}
     </div>
   );
 }
