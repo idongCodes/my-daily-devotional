@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import ChapterModal from "./ChapterModal";
-import { getVerseContext } from "@/app/actions";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface VerseData {
   text: string;
@@ -86,34 +86,44 @@ export default function VerseOfTheDay() {
 
             // Now check/fetch context if missing
             if (!currentVerse.context) {
-                // If we previously tried and failed with a permanent error, maybe we shouldn't retry immediately?
-                // But for now, let's try.
                 setContextLoading(true);
                 setContextError(null);
 
-                const contextRes = await getVerseContext(currentVerse.reference, currentVerse.text);
-                
-                if (contextRes.success && contextRes.data) {
-                    currentVerse.context = contextRes.data;
+                const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+
+                if (!apiKey) {
+                   setContextError("AI Service not configured (API Key missing).");
+                   setContextLoading(false);
+                   return;
+                }
+
+                try {
+                    const genAI = new GoogleGenerativeAI(apiKey);
+                    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+                    const prompt = `Provide a detailed, spiritual, and historical context for the Bible verse: ${currentVerse.reference} - "${currentVerse.text}". Explain its meaning and application for a daily devotional. Keep the tone encouraging and instructional. Limit the response to around 500 words.`;
+                    
+                    const result = await model.generateContent(prompt);
+                    const response = await result.response;
+                    const summary = response.text();
+
+                    currentVerse.context = summary;
                     // Update state
                     setVerse({ ...currentVerse });
                     // Update cache
                     localStorage.setItem(storageKey, JSON.stringify(currentVerse));
-                } else {
-                    const errMsg = contextRes.error || "Failed to load context.";
-                    console.warn(errMsg);
+
+                } catch (err: any) {
+                    console.error("Gemini Client Error:", err);
+                    const errMsg = err.message || "Failed to load context.";
                     
                     if (errMsg.includes("429") || errMsg.includes("Too Many Requests")) {
                        setContextError("AI Service is busy (Rate Limit). Please try again later.");
-                    } else if (errMsg.includes("GEMINI_API_KEY")) {
-                       setContextError("AI Service not configured.");
                     } else {
                        setContextError("Temporarily unavailable.");
                     }
                 }
                 setContextLoading(false);
             } else {
-                 // Ensure cache is fresh if we just fetched a new verse without context above
                  if (!stored) {
                     localStorage.setItem(storageKey, JSON.stringify(currentVerse));
                  }
