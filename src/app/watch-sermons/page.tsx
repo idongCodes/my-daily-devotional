@@ -31,8 +31,8 @@ export default function WatchSermons() {
           date: "2023-10-08T10:00:00Z"
         },
         {
-          id: "video3",
-          title: "Finding Peace in the Storm (Mock)",
+          id: "WJgD55r4s-M",
+          title: "Finding Peace in the Storm | Dr. David Jeremiah",
           date: "2023-10-01T10:00:00Z"
         }
       ];
