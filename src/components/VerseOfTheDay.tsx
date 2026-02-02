@@ -80,6 +80,9 @@ export default function VerseOfTheDay() {
               text: data.text.trim(),
               reference: data.reference,
             };
+            
+            // Save immediately to ensure persistence even if AI fails
+            localStorage.setItem(storageKey, JSON.stringify(currentVerse));
         }
 
         if (currentVerse) {
