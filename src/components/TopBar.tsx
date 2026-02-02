@@ -20,6 +20,26 @@ function BookIcon({ className }: { className?: string }) {
   );
 }
 
+function VideoIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M23 7l-7 5 7 5V7z" />
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+    </svg>
+  );
+}
+
 export default function TopBar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-black">
@@ -29,6 +49,12 @@ export default function TopBar() {
             <Link href="/" className="flex items-center gap-2 font-bold text-xl text-gray-900 dark:text-white hover:opacity-80 transition-opacity">
               <BookIcon className="h-6 w-6" />
               <span>My Daily Devotional</span>
+            </Link>
+          </div>
+          <div>
+            <Link href="/watch-sermons" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+              <VideoIcon className="h-6 w-6" />
+              <span className="sr-only">Watch Sermons</span>
             </Link>
           </div>
         </div>
