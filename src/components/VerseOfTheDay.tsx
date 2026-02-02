@@ -104,7 +104,8 @@ export default function VerseOfTheDay() {
 
                 try {
                     const genAI = new GoogleGenerativeAI(apiKey);
-                    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+                    // Switched to Gemma 3 12B IT for higher rate limits (14.4k RPD)
+                    const model = genAI.getGenerativeModel({ model: "gemma-3-12b-it" });
                     
                     const prompt = `Analyze the Bible verse: ${currentVerse.reference} - "${currentVerse.text}".
                     
