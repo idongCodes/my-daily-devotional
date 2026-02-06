@@ -111,9 +111,9 @@ export default function VerseOfTheDay() {
                     
                     Provide a response in strictly valid JSON format with the following structure:
                     {
-                      "context": "Detailed spiritual and historical context (approx 500 words).",
-                      "application": "A detailed Life Application Case Study describing real-life scenarios where this verse applies (approx 700 words).",
-                      "prayer": "A comprehensive prayer (approx 1000 words) based on the verse. Structure the prayer exactly as follows: 1. Praise and Worship (few sentences). 2. Thanksgiving (few sentences). 3. Asking for Cleansing and Forgiveness. 4. Inviting Communion with the Holy Spirit. 5. Asking for Restoration and Intervention in life's endeavors/difficulties. 6. Asking for help applying today's word. 7. Praise of who God is. 8. Inviting God's Will. 9. Ending with a Benediction."
+                      "context": "Detailed spiritual and historical context (approx 400 words).",
+                      "application": "A detailed Life Application Case Study describing real-life scenarios where this verse applies (approx 400 words).",
+                      "prayer": "A comprehensive prayer (approx 400 words) based on the verse. Structure the prayer exactly as follows: 1. Praise and Worship (few sentences). 2. Thanksgiving (few sentences). 3. Asking for Cleansing and Forgiveness. 4. Inviting Communion with the Holy Spirit. 5. Asking for Restoration and Intervention in life's endeavors/difficulties. 6. Asking for help applying today's word. 7. Praise of who God is. 8. Inviting God's Will. 9. Ending with a Benediction."
                     }
                     
                     Ensure the tone is encouraging, instructional, and deeply spiritual. Do not include markdown formatting like \`\`\`json.`;
