@@ -113,7 +113,7 @@ export default function VerseOfTheDay() {
                     {
                       "context": "Detailed spiritual and historical context (approx 400 words).",
                       "application": "A detailed Life Application Case Study describing real-life scenarios where this verse applies (approx 400 words).",
-                      "prayer": "A comprehensive prayer (approx 400 words) based on the verse. Structure the prayer exactly as follows: 1. Praise and Worship (few sentences). 2. Thanksgiving (few sentences). 3. Asking for Cleansing and Forgiveness. 4. Inviting Communion with the Holy Spirit. 5. Asking for Restoration and Intervention in life's endeavors/difficulties. 6. Asking for help applying today's word. 7. Praise of who God is. 8. Inviting God's Will. 9. Ending with a Benediction."
+                      "prayer": "A comprehensive prayer (approx 400 words) based on the verse. Structure the prayer as a single cohesive text flowing through these themes without using numbers: Praise and Worship, Thanksgiving, Asking for Cleansing and Forgiveness, Inviting Communion with the Holy Spirit, Asking for Restoration and Intervention in life's endeavors/difficulties, Asking for help applying today's word, Praise of who God is, and Inviting God's Will. Finally, end with a separate section explicitly labeled 'Benediction:' followed by the benediction text."
                     }
                     
                     Ensure the tone is encouraging, instructional, and deeply spiritual. Do not include markdown formatting like \`\`\`json.`;
