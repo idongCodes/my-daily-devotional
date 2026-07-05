@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import ChapterModal from "./ChapterModal";
-import ContactForm from "./ContactForm";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface VerseData {
@@ -263,9 +262,6 @@ export default function VerseOfTheDay() {
                     </p>
                 )}
             </div>
-
-            {/* Contact Form Section */}
-            <ContactForm />
 
           </div>
         ) : (

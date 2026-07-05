@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import ContactForm from "./ContactForm";
 
 export default function Footer() {
+  const [isContactOpen, setIsContactOpen] = useState(false);
   const currentYear = new Date().getFullYear();
 
   return (
@@ -11,9 +16,9 @@ export default function Footer() {
             Watch Live Sermons
           </Link>
           <span className="text-gray-400 font-normal">|</span>
-          <Link href="#contact" className="hover:underline">
+          <button onClick={() => setIsContactOpen(true)} className="hover:underline text-blue-600 dark:text-blue-400 font-semibold cursor-pointer">
             Get in Touch
-          </Link>
+          </button>
         </div>
         <p>
           &copy; {currentYear} My Daily Devotional. All Rights Reserved. Made with ✝️ by{" "}
@@ -27,6 +32,7 @@ export default function Footer() {
           </Link>
         </p>
       </div>
+      <ContactForm isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </footer>
   );
 }

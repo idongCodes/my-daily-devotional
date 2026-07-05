@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function ContactForm() {
+export default function ContactForm({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,14 +18,28 @@ export default function ContactForm() {
       `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
     )}`;
     window.location.href = mailtoUrl;
+    onClose();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div id="contact" className="w-full text-left max-w-3xl border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
+    <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-2xl relative">
+        <button 
+           onClick={onClose}
+           className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+           aria-label="Close Contact Form"
+        >
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div className="p-8">
       <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Get In Touch</h3>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
         Inquiries, feedback, appreciation, just want to say hello? Send me a message below.
@@ -96,6 +110,8 @@ export default function ContactForm() {
           Send Message
         </button>
       </form>
+      </div>
+      </div>
     </div>
   );
 }
