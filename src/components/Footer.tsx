@@ -15,7 +15,7 @@ export default function Footer() {
         <p>
           &copy; {currentYear} My Daily Devotional. All Rights Reserved. Made with ✝️ by{" "}
           <Link
-            href="https://idong-essien.vercel.app"
+            href="https://essien.dev"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium underline hover:text-gray-900 dark:hover:text-white transition-colors"
