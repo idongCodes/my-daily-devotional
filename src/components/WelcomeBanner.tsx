@@ -8,7 +8,13 @@ export default function WelcomeBanner() {
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
-    const hideBanner = localStorage.getItem("hideWelcomeBanner");
+    let hideBanner = "false";
+    try {
+      hideBanner = localStorage.getItem("hideWelcomeBanner") || "false";
+    } catch (e) {
+      console.warn("localStorage blocked in WelcomeBanner");
+    }
+    
     if (hideBanner === "true") {
       setShouldRender(false);
       return;
@@ -20,7 +26,11 @@ export default function WelcomeBanner() {
 
   const handleClose = () => {
     if (dontShowAgain) {
-      localStorage.setItem("hideWelcomeBanner", "true");
+      try {
+        localStorage.setItem("hideWelcomeBanner", "true");
+      } catch (e) {
+        console.warn("localStorage blocked in WelcomeBanner");
+      }
     }
     setIsVisible(false);
     // Wait for animation to finish before removing from DOM

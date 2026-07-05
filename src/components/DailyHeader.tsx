@@ -39,38 +39,54 @@ export default function DailyHeader() {
     setDateString(formattedDate.replace(/, (\d{4})/, ' $1'));
 
     // 2. Fetch Weather
+    const fetchWeatherByCoords = async (latitude: number, longitude: number) => {
+      try {
+        const res = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=fahrenheit&timezone=auto`
+        );
+        
+        if (!res.ok) throw new Error("Failed to fetch weather data");
+        
+        const data = await res.json();
+        setWeather({
+          current: data.current_weather,
+          daily: data.daily,
+        });
+        setError(null);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to load weather.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchFallbackWeather = async () => {
+      try {
+        const geoRes = await fetch('https://get.geojs.io/v1/ip/geo.json');
+        if (!geoRes.ok) throw new Error("IP Geo failed");
+        const geoData = await geoRes.json();
+        await fetchWeatherByCoords(parseFloat(geoData.latitude), parseFloat(geoData.longitude));
+      } catch (err) {
+        console.error("Fallback geo failed", err);
+        setError("Location access denied.");
+        setLoading(false);
+      }
+    };
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const { latitude, longitude } = position.coords;
-            const res = await fetch(
-              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=fahrenheit&timezone=auto`
-            );
-            
-            if (!res.ok) throw new Error("Failed to fetch weather data");
-            
-            const data = await res.json();
-            setWeather({
-              current: data.current_weather,
-              daily: data.daily,
-            });
-          } catch (err) {
-            console.error(err);
-            setError("Unable to load weather.");
-          } finally {
-            setLoading(false);
-          }
+        (position) => {
+          fetchWeatherByCoords(position.coords.latitude, position.coords.longitude);
         },
         (err) => {
-          console.error(err);
-          setError("Location access denied.");
-          setLoading(false);
-        }
+          console.warn("Geolocation denied or failed, using IP fallback.", err);
+          fetchFallbackWeather();
+        },
+        { timeout: 5000 }
       );
     } else {
-      setError("Geolocation not supported.");
-      setLoading(false);
+      fetchFallbackWeather();
     }
   }, []);
 

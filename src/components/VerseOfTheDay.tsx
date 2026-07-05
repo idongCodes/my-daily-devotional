@@ -4,6 +4,25 @@ import { useEffect, useState, useRef } from "react";
 import ChapterModal from "./ChapterModal";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const safeGetItem = (key: string) => {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+};
+
+const safeSetItem = (key: string, value: string) => {
+  try { localStorage.setItem(key, value); } catch (e) { console.warn("localStorage blocked", e); }
+};
+
+const safeCleanupOldKeys = (currentKey: string) => {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('votd_') && key !== currentKey) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch (e) { console.warn("localStorage blocked", e); }
+};
+
 interface VerseData {
   text: string;
   reference: string;
@@ -56,7 +75,7 @@ export default function VerseOfTheDay() {
         const storageKey = `votd_${dateKey}`;
 
         // Check Cache
-        const stored = localStorage.getItem(storageKey);
+        const stored = safeGetItem(storageKey);
         let currentVerse: VerseData | null = null;
 
         if (stored) {
@@ -64,12 +83,7 @@ export default function VerseOfTheDay() {
           currentVerse = parsed;
         } else {
            // Cleanup old keys
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('votd_') && key !== storageKey) {
-                    localStorage.removeItem(key);
-                }
-            }
+           safeCleanupOldKeys(storageKey);
 
             // Fetch new verse
             const res = await fetch("https://bible-api.com/?random=verse");
@@ -82,7 +96,7 @@ export default function VerseOfTheDay() {
             };
             
             // Save immediately to ensure persistence even if AI fails
-            localStorage.setItem(storageKey, JSON.stringify(currentVerse));
+            safeSetItem(storageKey, JSON.stringify(currentVerse));
         }
 
         if (currentVerse) {
@@ -133,7 +147,7 @@ export default function VerseOfTheDay() {
                     // Update state
                     setVerse({ ...currentVerse });
                     // Update cache
-                    localStorage.setItem(storageKey, JSON.stringify(currentVerse));
+                    safeSetItem(storageKey, JSON.stringify(currentVerse));
 
                 } catch (err: any) {
                     console.error("Gemini Client Error:", err);
@@ -148,7 +162,7 @@ export default function VerseOfTheDay() {
                 setContextLoading(false);
             } else {
                  if (!stored) {
-                    localStorage.setItem(storageKey, JSON.stringify(currentVerse));
+                    safeSetItem(storageKey, JSON.stringify(currentVerse));
                  }
             }
         }
