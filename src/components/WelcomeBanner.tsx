@@ -5,14 +5,23 @@ import { useState, useEffect } from "react";
 export default function WelcomeBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(true);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
+    const hideBanner = localStorage.getItem("hideWelcomeBanner");
+    if (hideBanner === "true") {
+      setShouldRender(false);
+      return;
+    }
     // Start animation shortly after mount
     const timer = setTimeout(() => setIsVisible(true), 500);
     return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
+    if (dontShowAgain) {
+      localStorage.setItem("hideWelcomeBanner", "true");
+    }
     setIsVisible(false);
     // Wait for animation to finish before removing from DOM
     setTimeout(() => setShouldRender(false), 1000);
@@ -77,10 +86,19 @@ export default function WelcomeBanner() {
                 </div>
             </div>
             
-            <div className="mt-8 text-center md:text-left">
+            <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-gray-100 dark:border-gray-800 pt-6">
+                <label className="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+                    <input 
+                        type="checkbox" 
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                        checked={dontShowAgain}
+                        onChange={(e) => setDontShowAgain(e.target.checked)}
+                    />
+                    <span className="text-sm">Don't show this again</span>
+                </label>
                 <button 
                     onClick={handleClose}
-                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-all shadow-lg hover:shadow-blue-500/30"
+                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-all shadow-lg hover:shadow-blue-500/30 w-full md:w-auto"
                 >
                     Get Started
                 </button>

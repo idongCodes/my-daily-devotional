@@ -104,8 +104,8 @@ export default function VerseOfTheDay() {
 
                 try {
                     const genAI = new GoogleGenerativeAI(apiKey);
-                    // Switched to Gemma 3 12B IT for higher rate limits (14.4k RPD)
-                    const model = genAI.getGenerativeModel({ model: "gemma-3-12b-it" });
+                    // Switched to gemini-3.5-flash as the API has updated
+                    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
                     
                     const prompt = `Analyze the Bible verse: ${currentVerse.reference} - "${currentVerse.text}".
                     
@@ -243,9 +243,19 @@ export default function VerseOfTheDay() {
                         <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-4/6"></div>
                     </div>
                 ) : verse.prayer ? (
-                    <p className="text-gray-700 dark:text-gray-300 leading-7 whitespace-pre-line font-serif italic text-lg">
-                        {verse.prayer}
-                    </p>
+                    <div className="space-y-6">
+                        <p className="text-gray-700 dark:text-gray-300 leading-7 whitespace-pre-line font-serif italic text-lg">
+                            {verse.prayer.split(/Benediction:\s*/i)[0].trim()}
+                        </p>
+                        {verse.prayer.match(/Benediction:\s*/i) && (
+                            <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/50">
+                                <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-3">Benediction</h4>
+                                <p className="text-blue-900 dark:text-blue-100 leading-7 font-medium whitespace-pre-line text-lg">
+                                    {verse.prayer.split(/Benediction:\s*/i)[1]?.trim()}
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 ) : (
                     <p className="text-gray-500 italic text-sm">
                          {contextError || "Prayer unavailable."}
