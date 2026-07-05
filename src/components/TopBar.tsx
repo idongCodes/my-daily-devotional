@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import ContactForm from "./ContactForm";
 
 function BookIcon({ className }: { className?: string }) {
   return (
@@ -40,7 +44,29 @@ function VideoIcon({ className }: { className?: string }) {
   );
 }
 
+function EnvelopeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="2" y="4" width="20" height="16" rx="2" ry="2" />
+      <path d="M2 4l10 8 10-8" />
+    </svg>
+  );
+}
+
 export default function TopBar() {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,14 +77,19 @@ export default function TopBar() {
               <span>My Daily Devotional</span>
             </Link>
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <Link href="/watch-sermons" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
               <VideoIcon className="h-6 w-6" />
               <span className="sr-only">Watch Sermons</span>
             </Link>
+            <button onClick={() => setIsContactOpen(true)} className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+              <EnvelopeIcon className="h-6 w-6" />
+              <span className="sr-only">Contact</span>
+            </button>
           </div>
         </div>
       </div>
+      <ContactForm isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </header>
   );
 }
