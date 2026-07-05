@@ -4,7 +4,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-black pt-6 pb-20">
+    <footer className="w-full border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-black pt-6 pb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center text-xs text-gray-600 dark:text-gray-400">
         <Link 
           href="/watch-sermons" 
