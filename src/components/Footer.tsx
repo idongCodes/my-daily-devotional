@@ -23,14 +23,6 @@ export default function Footer() {
             idongCodes
           </Link>
         </p>
-        
-        {/* Contact Email */}
-        <a 
-          href="mailto:idongesit_essien@ymail.com" 
-          className="mt-4 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors hover:underline text-center text-sm"
-        >
-          Inquiries, feedback, appreciation, just want to say hello?
-        </a>
       </div>
     </footer>
   );
