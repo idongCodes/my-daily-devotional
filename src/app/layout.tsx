@@ -16,8 +16,48 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My Daily Devotional",
-  description: "A web app designed for spending time in the word, understanding scripture, applying biblical teachings to daily life, fostering a deeper relationship with God, worshipping God in everyday living, and accessing online Sunday services.",
+  metadataBase: new URL('https://my-daily-devotional.vercel.app'),
+  title: {
+    default: "My Daily Devotional | Scripture, Prayer, & Live Sermons",
+    template: "%s | My Daily Devotional"
+  },
+  description: "Your digital sanctuary for daily Bible verses, AI-guided life application, powerful prayers, and live Sunday sermons. Foster a deeper relationship with God today.",
+  keywords: ["Daily Devotional", "Bible Verses", "Christian Web App", "AI Bible Study", "Live Sermons", "Prayer Generator", "Scripture Application", "Faith Journey"],
+  authors: [{ name: "idongCodes", url: "https://essien.dev" }],
+  creator: "idongCodes",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://my-daily-devotional.vercel.app",
+    siteName: "My Daily Devotional",
+    title: "My Daily Devotional | Scripture, Prayer, & Live Sermons",
+    description: "Start your day with curated Bible verses, AI-guided context, deep life application, and personalized prayers.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "My Daily Devotional preview featuring a serene Bible reading interface",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "My Daily Devotional | Scripture, Prayer, & Live Sermons",
+    description: "Start your day with curated Bible verses, AI-guided context, deep life application, and personalized prayers.",
+    images: ["/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
