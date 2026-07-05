@@ -25,7 +25,7 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="w-full text-left max-w-3xl border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
+    <div id="contact" className="w-full text-left max-w-3xl border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
       <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Get In Touch</h3>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
         Inquiries, feedback, appreciation, just want to say hello? Send me a message below.

@@ -6,12 +6,15 @@ export default function Footer() {
   return (
     <footer className="w-full border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-black pt-6 pb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center text-xs text-gray-600 dark:text-gray-400">
-        <Link 
-          href="/watch-sermons" 
-          className="mb-4 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          Watch Live Sermons
-        </Link>
+        <div className="mb-4 flex items-center justify-center gap-3 text-sm font-semibold text-blue-600 dark:text-blue-400">
+          <Link href="/watch-sermons" className="hover:underline">
+            Watch Live Sermons
+          </Link>
+          <span className="text-gray-400 font-normal">|</span>
+          <Link href="#contact" className="hover:underline">
+            Get in Touch
+          </Link>
+        </div>
         <p>
           &copy; {currentYear} My Daily Devotional. All Rights Reserved. Made with ✝️ by{" "}
           <Link
